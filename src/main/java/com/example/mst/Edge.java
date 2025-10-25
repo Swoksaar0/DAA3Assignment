@@ -18,4 +18,8 @@ public class Edge {
         if (x.equals(v)) return u;
         throw new IllegalArgumentException();
     }
+    @Override
+    public String toString() {
+        return u + "-" + v + ":" + weight;
+    }
 }
