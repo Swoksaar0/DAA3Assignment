@@ -2,7 +2,7 @@
 ## Minimum Spanning Tree Algorithm Analysis
 
 **Student:** Yessenkhossov Dinmukhammed
-**Course:** Data Structures and Algorithms  
+**Course:** Design and Analysis of Algorithms
 **Date:** October 2025
 
 ---
