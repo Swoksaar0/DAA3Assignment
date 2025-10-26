@@ -3,7 +3,6 @@ package com.example.mst;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import java.io.FileInputStream;
@@ -27,16 +26,41 @@ public class OutputGenerator {
                 new InputStreamReader(is, StandardCharsets.UTF_8)
         ).getAsJsonObject();
         JsonArray graphs = root.getAsJsonArray("graphs");
-        JsonArray results = new JsonArray();
-        for (int i = 0; i < graphs.size(); i++) {
-            JsonObject go = graphs.get(i).getAsJsonObject();
-            int id = go.get("id").getAsInt();
-            List<String> nodes = new ArrayList<String>();
+
+        System.out.println("Warming up JVM...");
+        for (int w = 0; w < 5; w++) {
+            JsonObject go = graphs.get(0).getAsJsonObject();
+            List<String> nodes = new ArrayList<>();
             JsonArray na = go.getAsJsonArray("nodes");
             for (int j = 0; j < na.size(); j++) {
                 nodes.add(na.get(j).getAsString());
             }
-            List<Edge> edges = new ArrayList<Edge>();
+            List<Edge> edges = new ArrayList<>();
+            JsonArray ea = go.getAsJsonArray("edges");
+            for (int j = 0; j < ea.size(); j++) {
+                JsonObject eo = ea.get(j).getAsJsonObject();
+                edges.add(new Edge(
+                        eo.get("from").getAsString(),
+                        eo.get("to").getAsString(),
+                        eo.get("weight").getAsInt()
+                ));
+            }
+            Graph g = new Graph(nodes, edges);
+            Prim.run(g);
+            Kruskal.run(g);
+        }
+        System.out.println("Warm-up complete. Running tests...\n");
+
+        JsonArray results = new JsonArray();
+        for (int i = 0; i < graphs.size(); i++) {
+            JsonObject go = graphs.get(i).getAsJsonObject();
+            int id = go.get("id").getAsInt();
+            List<String> nodes = new ArrayList<>();
+            JsonArray na = go.getAsJsonArray("nodes");
+            for (int j = 0; j < na.size(); j++) {
+                nodes.add(na.get(j).getAsString());
+            }
+            List<Edge> edges = new ArrayList<>();
             JsonArray ea = go.getAsJsonArray("edges");
             for (int j = 0; j < ea.size(); j++) {
                 JsonObject eo = ea.get(j).getAsJsonObject();
@@ -87,6 +111,9 @@ public class OutputGenerator {
                     Math.round(rk.getExecutionTimeMs() * 100.0) / 100.0);
             rec.add("kruskal", kObj);
             results.add(rec);
+
+            System.out.printf("Graph %d: Prim %.2fms, Kruskal %.2fms%n",
+                    id, rp.getExecutionTimeMs(), rk.getExecutionTimeMs());
         }
         JsonObject out = new JsonObject();
         out.add("results", results);
@@ -97,5 +124,6 @@ public class OutputGenerator {
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         gson.toJson(out, w);
         w.close();
+        System.out.println("\n✓ assign_3_output.json generated");
     }
 }

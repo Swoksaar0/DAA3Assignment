@@ -1,80 +1,90 @@
 package com.example.mst;
 
 import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import java.io.BufferedWriter;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
+import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ComparisonGenerator {
     public static void main(String[] args) throws Exception {
-        InputStream is = ComparisonGenerator.class
-                .getClassLoader()
-                .getResourceAsStream("assign_3_output.json");
+        InputStream is = ComparisonGenerator.class.getClassLoader()
+                .getResourceAsStream("assign_3_input.json");
         if (is == null) {
-            is = new FileInputStream("assign_3_output.json");
+            is = new FileInputStream("assign_3_input.json");
         }
-        InputStreamReader reader = new InputStreamReader(is, StandardCharsets.UTF_8);
-        JsonObject root = JsonParser.parseReader(reader).getAsJsonObject();
-        JsonArray resultsArray = root.getAsJsonArray("results");
+        JsonObject root = JsonParser.parseReader(
+                new InputStreamReader(is, StandardCharsets.UTF_8)
+        ).getAsJsonObject();
+        JsonArray graphs = root.getAsJsonArray("graphs");
 
-        FileOutputStream fos = new FileOutputStream("comparison.csv");
-        OutputStreamWriter osw = new OutputStreamWriter(fos, StandardCharsets.UTF_8);
-        BufferedWriter writer = new BufferedWriter(osw);
-        writer.write('\uFEFF');
-
-        writer.write("graph_id;vertices;edges;cost_prim;ops_prim;time_prim;cost_kruskal;ops_kruskal;time_kruskal");
-        writer.newLine();
-
-        for (int i = 0; i < resultsArray.size(); i++) {
-            JsonElement elem = resultsArray.get(i);
-            JsonObject rec = elem.getAsJsonObject();
-
-            int graphId = rec.get("graph_id").getAsInt();
-            JsonObject stats = rec.getAsJsonObject("input_stats");
-            int vertices = stats.get("vertices").getAsInt();
-            int edges = stats.get("edges").getAsInt();
-
-            JsonObject prim = rec.getAsJsonObject("prim");
-            int costPrim = prim.get("total_cost").getAsInt();
-            int opsPrim = prim.get("operations_count").getAsInt();
-            double timePrim = prim.get("execution_time_ms").getAsDouble();
-
-            JsonObject kruskal = rec.getAsJsonObject("kruskal");
-            int costKruskal = kruskal.get("total_cost").getAsInt();
-            int opsKruskal = kruskal.get("operations_count").getAsInt();
-            double timeKruskal = kruskal.get("execution_time_ms").getAsDouble();
-
-            String line = "";
-            line = line + graphId;
-            line = line + ";";
-            line = line + vertices;
-            line = line + ";";
-            line = line + edges;
-            line = line + ";";
-            line = line + costPrim;
-            line = line + ";";
-            line = line + opsPrim;
-            line = line + ";";
-            line = line + timePrim;
-            line = line + ";";
-            line = line + costKruskal;
-            line = line + ";";
-            line = line + opsKruskal;
-            line = line + ";";
-            line = line + timeKruskal;
-
-            writer.write(line);
-            writer.newLine();
+        System.out.println("Warming up JVM...");
+        JsonObject go0 = graphs.get(0).getAsJsonObject();
+        for (int w = 0; w < 5; w++) {
+            List<String> nodes = new ArrayList<>();
+            JsonArray na = go0.getAsJsonArray("nodes");
+            for (int j = 0; j < na.size(); j++) {
+                nodes.add(na.get(j).getAsString());
+            }
+            List<Edge> edges = new ArrayList<>();
+            JsonArray ea = go0.getAsJsonArray("edges");
+            for (int j = 0; j < ea.size(); j++) {
+                JsonObject eo = ea.get(j).getAsJsonObject();
+                edges.add(new Edge(
+                        eo.get("from").getAsString(),
+                        eo.get("to").getAsString(),
+                        eo.get("weight").getAsInt()
+                ));
+            }
+            Graph g = new Graph(nodes, edges);
+            Prim.run(g);
+            Kruskal.run(g);
         }
+        System.out.println("Warm-up complete.\n");
 
+        PrintWriter writer = new PrintWriter(new FileWriter("results_comparison.csv"));
+        writer.println("graph_id;vertices;edges;algorithm;cost;operations;time_ms");
+
+        for (int i = 0; i < graphs.size(); i++) {
+            JsonObject go = graphs.get(i).getAsJsonObject();
+            int id = go.get("id").getAsInt();
+            List<String> nodes = new ArrayList<>();
+            JsonArray na = go.getAsJsonArray("nodes");
+            for (int j = 0; j < na.size(); j++) {
+                nodes.add(na.get(j).getAsString());
+            }
+            List<Edge> edges = new ArrayList<>();
+            JsonArray ea = go.getAsJsonArray("edges");
+            for (int j = 0; j < ea.size(); j++) {
+                JsonObject eo = ea.get(j).getAsJsonObject();
+                edges.add(new Edge(
+                        eo.get("from").getAsString(),
+                        eo.get("to").getAsString(),
+                        eo.get("weight").getAsInt()
+                ));
+            }
+            Graph graph = new Graph(nodes, edges);
+            MSTResult prim = Prim.run(graph);
+            MSTResult kruskal = Kruskal.run(graph);
+
+            writer.printf("%d;%d;%d;Prim;%d;%d;%.2f%n",
+                    id, nodes.size(), edges.size(),
+                    prim.getTotalCost(), prim.getOperationCount(),
+                    prim.getExecutionTimeMs());
+            writer.printf("%d;%d;%d;Kruskal;%d;%d;%.2f%n",
+                    id, nodes.size(), edges.size(),
+                    kruskal.getTotalCost(), kruskal.getOperationCount(),
+                    kruskal.getExecutionTimeMs());
+
+            System.out.printf("Graph %d done%n", id);
+        }
         writer.close();
+        System.out.println("\n✓ results_comparison.csv created");
     }
 }

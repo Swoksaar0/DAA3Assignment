@@ -12,29 +12,19 @@ public class Prim {
         long start = System.nanoTime();
         List<String> vertices = graph.getVertices();
         int V = vertices.size();
-        Set<String> visited = new HashSet<String>();
-        List<Edge> mst = new ArrayList<Edge>();
+        Set<String> visited = new HashSet<>();
+        List<Edge> mst = new ArrayList<>();
         int opCount = 0;
-        PriorityQueue<Edge> pq = new PriorityQueue<Edge>(new Comparator<Edge>() {
-            public int compare(Edge e1, Edge e2) {
-                if (e1.getWeight() < e2.getWeight()) {
-                    return -1;
-                } else {
-                    if (e1.getWeight() > e2.getWeight()) {
-                        return 1;
-                    } else {
-                        return 0;
-                    }
-                }
-            }
-        });
+        PriorityQueue<Edge> pq = new PriorityQueue<>(Comparator.comparingInt(Edge::getWeight));
+
         String startV = vertices.get(0);
         visited.add(startV);
         List<Edge> adj0 = graph.getAdjacencyList().get(startV);
-        for (int i = 0; i < adj0.size(); i++) {
-            pq.offer(adj0.get(i));
+        for (Edge e : adj0) {
+            pq.offer(e);
             opCount++;
         }
+
         while (!pq.isEmpty() && mst.size() < V - 1) {
             opCount++;
             Edge e = pq.poll();
@@ -45,17 +35,11 @@ public class Prim {
             if (uVis && vVis) {
                 continue;
             }
-            String next;
-            if (uVis) {
-                next = v;
-            } else {
-                next = u;
-            }
+            String next = uVis ? v : u;
             visited.add(next);
             mst.add(e);
             List<Edge> adjNext = graph.getAdjacencyList().get(next);
-            for (int i = 0; i < adjNext.size(); i++) {
-                Edge ne = adjNext.get(i);
+            for (Edge ne : adjNext) {
                 String other = ne.getOther(next);
                 if (!visited.contains(other)) {
                     pq.offer(ne);
@@ -63,11 +47,12 @@ public class Prim {
                 }
             }
         }
+
         long end = System.nanoTime();
         double timeMs = (end - start) / 1000000.0;
         int totalCost = 0;
-        for (int i = 0; i < mst.size(); i++) {
-            totalCost += mst.get(i).getWeight();
+        for (Edge e : mst) {
+            totalCost += e.getWeight();
         }
         return new MSTResult(mst, totalCost, opCount, timeMs);
     }
