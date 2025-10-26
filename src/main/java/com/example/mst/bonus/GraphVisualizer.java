@@ -27,7 +27,6 @@ public class GraphVisualizer extends JPanel {
         List<String> vertices = graph.getVertices();
         int n = vertices.size();
 
-        // Circular layout
         double centerX = 400;
         double centerY = 300;
         double radius = Math.min(centerX, centerY) - 80;
@@ -49,12 +48,10 @@ public class GraphVisualizer extends JPanel {
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                 RenderingHints.VALUE_ANTIALIAS_ON);
 
-        // Draw title
         g2.setFont(new Font("Arial", Font.BOLD, 20));
         g2.setColor(Color.BLACK);
         g2.drawString(title, 20, 30);
 
-        // Draw info
         g2.setFont(new Font("Arial", Font.PLAIN, 14));
         g2.drawString(String.format("Vertices: %d | Edges: %d | MST Cost: %d",
                 graph.getVertices().size(),
@@ -63,7 +60,6 @@ public class GraphVisualizer extends JPanel {
 
         Set<Edge> mstEdges = new HashSet<>(mstResult.getMstEdges());
 
-        // Draw all edges (non-MST in gray, MST in red)
         g2.setStroke(new BasicStroke(2));
         for (Edge e : graph.getEdges()) {
             Point2D p1 = positions.get(e.getU());
@@ -79,7 +75,6 @@ public class GraphVisualizer extends JPanel {
 
             g2.draw(new Line2D.Double(p1, p2));
 
-            // Draw weight label
             double midX = (p1.getX() + p2.getX()) / 2;
             double midY = (p1.getY() + p2.getY()) / 2;
             g2.setColor(Color.BLACK);
@@ -88,20 +83,16 @@ public class GraphVisualizer extends JPanel {
                     (float)midX - 10, (float)midY - 5);
         }
 
-        // Draw vertices
         for (String vertex : graph.getVertices()) {
             Point2D p = positions.get(vertex);
 
-            // Node circle
             g2.setColor(new Color(70, 130, 180)); // Steel blue
             g2.fill(new Ellipse2D.Double(p.getX() - 20, p.getY() - 20, 40, 40));
 
-            // Node border
             g2.setColor(new Color(25, 25, 112)); // Midnight blue
             g2.setStroke(new BasicStroke(2));
             g2.draw(new Ellipse2D.Double(p.getX() - 20, p.getY() - 20, 40, 40));
 
-            // Node label
             g2.setColor(Color.WHITE);
             g2.setFont(new Font("Arial", Font.BOLD, 14));
             FontMetrics fm = g2.getFontMetrics();
@@ -111,7 +102,6 @@ public class GraphVisualizer extends JPanel {
                     (float)(p.getY() + 5));
         }
 
-        // Draw legend
         drawLegend(g2);
     }
 
@@ -125,7 +115,6 @@ public class GraphVisualizer extends JPanel {
         g2.setStroke(new BasicStroke(1));
         g2.drawRect(x - 5, y - 20, 200, 70);
 
-        // MST edge
         g2.setColor(new Color(220, 20, 60));
         g2.setStroke(new BasicStroke(3));
         g2.drawLine(x, y, x + 40, y);
@@ -133,7 +122,6 @@ public class GraphVisualizer extends JPanel {
         g2.setFont(new Font("Arial", Font.PLAIN, 12));
         g2.drawString("MST Edge", x + 50, y + 5);
 
-        // Non-MST edge
         y += 25;
         g2.setColor(new Color(200, 200, 200));
         g2.setStroke(new BasicStroke(1));
@@ -142,7 +130,6 @@ public class GraphVisualizer extends JPanel {
         g2.drawString("Non-MST Edge", x + 50, y + 5);
     }
 
-    // FIXED: Static method for dual visualization
     public static void visualize(Graph graph, MSTResult prim, MSTResult kruskal) {
         JFrame frame = new JFrame("MST Visualization");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -158,18 +145,14 @@ public class GraphVisualizer extends JPanel {
         frame.setVisible(true);
     }
 
-    // FIXED: Save image method
     public void saveImage(String filename) {
-        // Create image with proper size
         int width = 800;
         int height = 600;
         BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
         Graphics2D g2 = image.createGraphics();
 
-        // Set size before painting
         setSize(width, height);
 
-        // Paint component to image
         paint(g2);
         g2.dispose();
 

@@ -6,7 +6,6 @@ public class VisualizationDemo {
     public static void main(String[] args) throws Exception {
         InputLoader loader = new InputLoader();
 
-        // Choose which graphs to visualize (small ones work best)
         int[] graphIds = {1, 2, 3}; // 5, 10, 15 vertices
 
         for (int id : graphIds) {
@@ -20,7 +19,6 @@ public class VisualizationDemo {
             System.out.printf("Prim Cost: %d, Kruskal Cost: %d%n",
                     prim.getTotalCost(), kruskal.getTotalCost());
 
-            // Save images (no GUI window needed)
             saveGraphImages(graph, prim, kruskal, id);
         }
 
@@ -30,7 +28,6 @@ public class VisualizationDemo {
 
     private static void saveGraphImages(Graph graph, MSTResult prim,
                                         MSTResult kruskal, int graphId) {
-        // Create visualizers
         GraphVisualizer primViz = new GraphVisualizer(graph, prim,
                 String.format("Prim's MST - Graph %d (Cost: %d)",
                         graphId, prim.getTotalCost()));
@@ -39,12 +36,10 @@ public class VisualizationDemo {
                 String.format("Kruskal's MST - Graph %d (Cost: %d)",
                         graphId, kruskal.getTotalCost()));
 
-        // Save images
         primViz.saveImage(String.format("graph_%d_prim.png", graphId));
         kruskalViz.saveImage(String.format("graph_%d_kruskal.png", graphId));
     }
 
-    // Optional: Show GUI window for one graph
     public static void showGUI(int graphId) throws Exception {
         InputLoader loader = new InputLoader();
         Graph graph = loader.loadGraph(graphId);

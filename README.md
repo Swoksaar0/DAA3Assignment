@@ -1,7 +1,7 @@
 # Assignment 3: Optimization of City Transportation Network
 ## Minimum Spanning Tree Algorithm Analysis
 
-**Student:** [Yessenkhossov Dinmukhammed]  
+**Student:** Yessenkhossov Dinmukhammed
 **Course:** Data Structures and Algorithms  
 **Date:** October 2025
 
@@ -325,12 +325,12 @@ Let V = number of vertices, E = number of edges
 ### 5.1 Test Environment
 
 **Hardware:**
-- Processor: [Your CPU]
-- RAM: [Your RAM]
-- Storage: [Your storage type]
+- Processor: intel core i3-115g4
+- RAM: 8gb
+- Storage: 512gb
 
 **Software:**
-- OS: [Your OS]
+- OS: Windows 11
 - Java: OpenJDK 11
 - JVM: HotSpot with default settings
 - Warm-up: 5 iterations on Graph 1
@@ -703,41 +703,3 @@ Both implementations successfully solve the city transportation network optimiza
 
 7. Knuth, D. E. (1997). *The Art of Computer Programming, Volume 1: Fundamental Algorithms* (3rd ed.). Addison-Wesley.
 
----
-
-## Appendices
-
-### Appendix A: Test Results Summary
-
-Complete test results available in:
-- `assign_3_output.json` - Detailed MST results
-- `results_comparison.csv` - Performance metrics
-- `mst_performance_analysis.png` - Visual analysis
-- `mst_summary_table.png` - Statistical summary
-
-### Appendix B: Source Code
-
-Full implementation available at: [Your GitHub Repository]
-
-Key files:
-- `Prim.java` - Prim's algorithm implementation
-- `Kruskal.java` - Kruskal's algorithm implementation
-- `DSU.java` - Disjoint Set Union
-- `Graph.java` - Graph data structure
-- `MSTTest.java` - Test suite (10 tests, all passing)
-
-### Appendix C: Visualization Examples
-
-Graph visualizations generated for Graphs 1-3 showing:
-- MST edges highlighted in red
-- Non-MST edges in gray
-- Edge weights labeled
-- Total MST cost displayed
-
-Files: `graph_1_prim.png`, `graph_1_kruskal.png`, etc.
-
----
-
-**Report Word Count:** ~5,800 words  
-**Pages:** 12-14 (including figures)  
-**Submission Date:** [Date]
