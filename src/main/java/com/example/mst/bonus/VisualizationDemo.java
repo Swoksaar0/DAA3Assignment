@@ -6,7 +6,7 @@ public class VisualizationDemo {
     public static void main(String[] args) throws Exception {
         InputLoader loader = new InputLoader();
 
-        int[] graphIds = {1, 2, 3}; // 5, 10, 15 vertices
+        int[] graphIds = {1, 2, 3};
 
         for (int id : graphIds) {
             System.out.println("\n=== Processing Graph " + id + " ===");
